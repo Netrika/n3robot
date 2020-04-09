@@ -3,11 +3,16 @@ import random
 import string
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import (CommandHandler, MessageHandler, Filters, ConversationHandler)
+import logging
 
 from n3robot import N3TelegramChat
 
 SILENT = range(1)
 MUTE = range(1)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 
 def register(update, context):
@@ -23,25 +28,30 @@ def register(update, context):
     # from_user = context.bot.get_chat_member(chat_id=update.effective_chat.id, user_id=update.message.from_user.id)
     # if from_user.status != 'creator' and from_user.status != 'administrator':
     #     return
-    text = ''
-    telegram_chat = N3TelegramChat.objects(chat_id=str(update.effective_chat.id))
+
+    telegram_chat = N3TelegramChat.objects.filter(chat_id=str(update.effective_chat.id))
     if not telegram_chat:
         telegram_chat = N3TelegramChat(
             chat_id=str(update.effective_chat.id),
             title=str(update.effective_chat.title),
-            api_id=str(''.join(random.choice(string.ascii_lowercase) for i in range(16)))
+            api_id=str(''.join(random.choice(string.ascii_lowercase) for i in range(16))),
+            is_active=True
         )
         try:
             telegram_chat.save()
         except Exception as e:
-            print(f'error - {e}')
+            logger.error(e)
         text = f'The chat was register!'
+        logger.info(f'{telegram_chat.title} created')
+        return context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='Markdown')
+
+    telegram_chat = N3TelegramChat.objects.get(chat_id=str(update.effective_chat.id))
     if not telegram_chat.api_id:
         telegram_chat.update(api_id=''.join(random.choice(string.ascii_lowercase) for i in range(16)))
+        telegram_chat.update(is_active=True)
         text = f'The chat settings updated!'
-    if text:
-        context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='Markdown')
-    telegram_chat.update(is_active=True)
+        logger.info(f'{telegram_chat.title} updated')
+        return context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='Markdown')
 
 
 def unregister(update, context):
@@ -54,12 +64,15 @@ def unregister(update, context):
     """
     from_user = context.bot.get_chat_member(chat_id=update.effective_chat.id, user_id=update.message.from_user.id)
     if from_user.status != 'creator' and from_user.status != 'administrator':
-        return
+        text = 'Only admins can deactivate chat!'
+        return context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='Markdown')
 
-    telegram_chat = N3TelegramChat.objects.filter(chat_id=str(update.effective_chat.id))
-    if telegram_chat:
-        telegram_chat.update(is_active=False)
-        telegram_chat.update(api_id=None)
+    telegram_chat = N3TelegramChat.objects.get(chat_id=str(update.effective_chat.id))
+    telegram_chat.update(is_active=False)
+    telegram_chat.update(api_id=None)
+    logger.info(f'{telegram_chat.title} deactivate')
+    text = 'Chat deactivate'
+    return context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='Markdown')
 
 
 def start_mute(update, context):
