@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from jinja2 import Template
 import random
 import string
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
@@ -6,6 +7,7 @@ from telegram.ext import (CommandHandler, MessageHandler, Filters, ConversationH
 import logging
 
 from n3robot import N3TelegramChat
+from config import Config
 
 SILENT = range(1)
 MUTE = range(1)
@@ -13,6 +15,12 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
+
+def render_message(api_id, template_name):
+    with open(f'templates/bot/{template_name}') as template_message:
+        template = Template(template_message.read())
+    return template.render(api_id=api_id, project_url=Config.PROJECT_URL)
 
 
 def register(update, context):
@@ -28,28 +36,29 @@ def register(update, context):
     # from_user = context.bot.get_chat_member(chat_id=update.effective_chat.id, user_id=update.message.from_user.id)
     # if from_user.status != 'creator' and from_user.status != 'administrator':
     #     return
-
+    api_id = ''.join(random.choice(string.ascii_lowercase) for i in range(16))
     telegram_chat = N3TelegramChat.objects.filter(chat_id=str(update.effective_chat.id))
     if not telegram_chat:
         telegram_chat = N3TelegramChat(
             chat_id=str(update.effective_chat.id),
             title=str(update.effective_chat.title),
-            api_id=str(''.join(random.choice(string.ascii_lowercase) for i in range(16))),
+            api_id=str(api_id),
             is_active=True
         )
         try:
             telegram_chat.save()
         except Exception as e:
             logger.error(e)
-        text = f'The chat was register!'
+
+        text = text = render_message(api_id=api_id, template_name='register.j2')
         logger.info(f'{telegram_chat.title} created')
         return context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='Markdown')
 
     telegram_chat = N3TelegramChat.objects.get(chat_id=str(update.effective_chat.id))
     if not telegram_chat.api_id:
-        telegram_chat.update(api_id=''.join(random.choice(string.ascii_lowercase) for i in range(16)))
+        telegram_chat.update(api_id=api_id)
         telegram_chat.update(is_active=True)
-        text = f'The chat settings updated!'
+        text = render_message(api_id=api_id, template_name='reregister.j2')
         logger.info(f'{telegram_chat.title} updated')
         return context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='Markdown')
 
