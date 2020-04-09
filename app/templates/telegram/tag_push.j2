@@ -1,0 +1,12 @@
+{% if before == '0000000000000000000000000000000000000000' %}
+{%set tag_status = 'created' %}
+{% else %}
+{%set tag_status = 'removed' %}
+{% endif %}
+{{ tag_emoji }} A tag [{{ ref|replace('refs/tags/','') }}]({{ project.web_url }}/-/tags/{{ ref|replace('refs/tags/','') }}) was {{ tag_status }} in the project [{{ project.path_with_namespace }}]({{ project.web_url }})
+{% if message -%}
+```
+{{ commit_emoji }} {{ message }}
+```
+{%- endif %}
+*By:* {{ user_name }}

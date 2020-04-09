@@ -1,0 +1,11 @@
+{% if build_status == 'success' %}
+{%set build_status_emoji = success_emoji %}
+{% elif build_status == 'running' %}
+{%set build_status_emoji = running_emoji %}
+{% elif build_status == 'failed' %}
+{%set build_status_emoji = failed_emoji %}
+{% endif %}
+
+{{ build_status_emoji }} Build [{{ build_stage }}/{{ build_name }}]({{ repository.homepage }}/-/jobs/{{ build_id }}) of  [{{ repository.name }}]({{ repository.homepage }}) {{ build_status }}.
+
+*By:* {{ user.name }}

@@ -1,0 +1,6 @@
+README.md
+.cicd
+venv
+.gitattributes
+.gitignore
+Makefile

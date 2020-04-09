@@ -1,0 +1,83 @@
+---
+version: "3"
+
+services:
+  bot:
+    environment:
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN}"
+      MONGODB_PASSWORD: "${MONGODB_PASSWORD}"
+      MONGODB_HOST: "mongodb"
+      PROJECT_URL: "${PROJECT_URL}"
+
+    image: n3robot:latest
+    command: bash -c "python -m n3robot" 2>&1
+    networks:
+      - backend
+    depends_on:
+      - mongodb
+
+  api:
+    environment:
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN}"
+      MONGODB_PASSWORD: "${MONGODB_PASSWORD}"
+      MONGODB_HOST: "mongodb"
+      PROJECT_URL: "${PROJECT_URL}"
+      FLASK_APP: "api.py"
+      REDIS_HOST: "redis"
+    image: n3robot:latest
+    command: bash -c "python -m flask run --host 0.0.0.0" 2>&1
+    networks:
+      - backend
+    depends_on:
+      - mongodb
+      - redis
+
+  huey:
+    environment:
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN}"
+      MONGODB_PASSWORD: "${MONGODB_PASSWORD}"
+      MONGODB_HOST: "mongodb"
+      PROJECT_URL: "${PROJECT_URL}"
+      REDIS_HOST: "redis"
+    image: n3robot:latest
+    command: bash -c "huey_consumer.py api.huey" 2>&1
+    networks:
+      - backend
+    depends_on:
+      - mongodb
+      - redis
+
+  redis:
+    image: "redis:alpine"
+    networks:
+      - backend
+
+  mongodb:
+    volumes:
+      - ./data/db:/data/db
+    image: "mongo:3.6-xenial"
+    networks:
+      - backend
+    command: mongod --auth
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "${MONGODB_USER}"
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGODB_PASSWORD}"
+      MONGO_INITDB_DATABASE: n3robot
+      MONGODB_DATA_DIR: /data/db
+      MONDODB_LOG_DIR: /dev/null
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./dockerfiles/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    command: /bin/bash -c "exec nginx -g 'daemon off;'" 2>&1
+    networks:
+      - backend
+    depends_on:
+      - api
+
+networks:
+  backend:
