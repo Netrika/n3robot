@@ -26,7 +26,7 @@ def render_message(api_id, template_name):
     """
     with open(f'templates/bot/{template_name}') as template_message:
         template = Template(template_message.read())
-    return template.render(api_id=api_id, project_url=Config.PROJECT_URL)
+    return template.render(api_id=api_id, project_url=Config.PROJECT_URL, wiki_url=Config.WIKI_URL)
 
 
 def register(update, context):

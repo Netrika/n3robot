@@ -39,6 +39,7 @@ dp.add_handler(silent_conv_handler)
 dp.add_handler(mute_conv_handler)
 dp.add_handler(conv_handler)
 
+dp.add_handler(MessageHandler(Filters.status_update.new_chat_members, register))
 dp.add_handler(MessageHandler(Filters.status_update.new_chat_members, send_welcome))
 dp.add_handler(MessageHandler(Filters.status_update.left_chat_member, drop_member))
 
