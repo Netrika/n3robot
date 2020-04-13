@@ -21,7 +21,7 @@ def is_mute(telegram_chat):
     return False
 
 
-@huey.task(retries=3, retry_delay=5)
+@huey.task(retries=3, retry_delay=3)
 def send_message(api_id, message, branch, gitlab_project):
     telegram_chat = N3TelegramChat.objects.get(api_id=api_id)
     if is_mute(telegram_chat):
@@ -31,15 +31,14 @@ def send_message(api_id, message, branch, gitlab_project):
         if not fnmatch(branch, project_branch):
             return
 
-    if project:
-        n3robot_bot.send_message(
-            chat_id=telegram_chat.chat_id,
-            text=message,
-            parse_mode='Markdown',
-            disable_web_page_preview=True,
-            timeout=60,
-            disable_notification=is_silent(telegram_chat)
-        )
+    n3robot_bot.send_message(
+        chat_id=telegram_chat.chat_id,
+        text=message,
+        parse_mode='Markdown',
+        disable_web_page_preview=True,
+        timeout=60,
+        disable_notification=is_silent(telegram_chat)
+    )
 
 
 @huey.task(retries=3, retry_delay=5)
