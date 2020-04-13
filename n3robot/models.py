@@ -46,7 +46,7 @@ class N3TelegramMessage:
         return {}
 
     def get_branch(self):
-        pass
+        return '*'
 
 
 class N3TelegramMessagePipeline(N3TelegramMessage):
