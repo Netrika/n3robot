@@ -133,3 +133,4 @@ dmypy.json
 .idea
 backend.tar*
 /data
+.cicd/ansible
