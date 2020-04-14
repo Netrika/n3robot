@@ -40,6 +40,11 @@ def register(update, context):
     # from_user = context.bot.get_chat_member(chat_id=update.effective_chat.id, user_id=update.message.from_user.id)
     # if from_user.status != 'creator' and from_user.status != 'administrator':
     #     return
+
+    for member in update.message.new_chat_members:
+        if context.bot.id != member.id:
+            return
+
     api_id = ''.join(random.choice(string.ascii_lowercase) for i in range(16))
     telegram_chat = N3TelegramChat.objects.filter(chat_id=str(update.effective_chat.id))
     if not telegram_chat:
