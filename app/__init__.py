@@ -5,8 +5,7 @@ from mongoengine import connect
 from emoji import emojize
 import logging
 
-from n3robot import (N3TelegramMessagePipeline, N3TelegramMessagePush, N3TelegramMessageBuild, N3TelegramMessageTagPush,
-                     N3TelegramMessageMergeRequestHook)
+from n3robot import (N3TelegramMessagePipeline, N3TelegramMessagePush, N3TelegramMessageBuild, N3TelegramMessageTagPush)
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
