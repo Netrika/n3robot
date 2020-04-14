@@ -27,8 +27,8 @@ def gitlab(project_api_id):
 
     tasks.update_projects_chat(project_api_id, gitlab_project)
     tasks.send_message(api_id=project_api_id,
-                                     message=message_text,
-                                     branch=message.get_branch(),
-                                     gitlab_project=gitlab_project)
+                       message=message_text,
+                       branch=message.get_branch(),
+                       gitlab_project=gitlab_project)
 
     return 'ok', 201
