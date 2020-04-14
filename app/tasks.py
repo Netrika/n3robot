@@ -21,15 +21,22 @@ def is_mute(telegram_chat):
     return False
 
 
-@huey.task(retries=3, retry_delay=3)
+@huey.task(retries=3, retry_delay=5)
 def send_message(api_id, message, branch, gitlab_project):
-    telegram_chat = N3TelegramChat.objects.get(api_id=api_id)
+    try:
+        telegram_chat = N3TelegramChat.objects.get(api_id=api_id)
+    except N3TelegramChat.DoesNotExist:
+        return
+
     if is_mute(telegram_chat):
         return
-    project = next((project for project in telegram_chat.projects if project.get('id') == gitlab_project.get('id')), {})
-    for project_branch in project.get('branches', []):
-        if not fnmatch(branch, project_branch):
-            return
+
+    if branch:
+        for project in telegram_chat.projects:
+            if project.get('id') == gitlab_project.get('id'):
+                for project_branch in project.get('branches', []):
+                    if not fnmatch(branch, project_branch):
+                        return
 
     n3robot_bot.send_message(
         chat_id=telegram_chat.chat_id,
@@ -43,9 +50,13 @@ def send_message(api_id, message, branch, gitlab_project):
 
 @huey.task(retries=3, retry_delay=5)
 def update_projects_chat(api_id, gitlab_project):
-    telegram_chat = N3TelegramChat.objects.get(api_id=api_id)
+    try:
+        telegram_chat = N3TelegramChat.objects.get(api_id=api_id)
+    except N3TelegramChat.DoesNotExist:
+        return
     for project in telegram_chat.projects:
         if project.get('id') == gitlab_project.get('id'):
             return
+
     telegram_chat.projects.append(gitlab_project)
     telegram_chat.save()
