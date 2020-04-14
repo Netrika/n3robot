@@ -5,6 +5,7 @@ from fnmatch import fnmatch
 from n3robot import N3TelegramChat
 from app import huey
 from app import app
+from app import app_logger
 
 n3robot_bot = Bot(token=app.config.get('TELEGRAM_BOT_TOKEN'))
 
@@ -36,9 +37,10 @@ def send_message(api_id, message, branch, gitlab_project):
             if project.get('id') == gitlab_project.get('id'):
                 for project_branch in project.get('branches', []):
                     if not fnmatch(branch, project_branch):
+                        app_logger.info('branch not found')
                         return
 
-    n3robot_bot.send_message(
+    response = n3robot_bot.send_message(
         chat_id=telegram_chat.chat_id,
         text=message,
         parse_mode='Markdown',
@@ -46,7 +48,7 @@ def send_message(api_id, message, branch, gitlab_project):
         timeout=60,
         disable_notification=is_silent(telegram_chat)
     )
-
+    app_logger.info(response)
 
 @huey.task(retries=3, retry_delay=5)
 def update_projects_chat(api_id, gitlab_project):
@@ -54,6 +56,7 @@ def update_projects_chat(api_id, gitlab_project):
         telegram_chat = N3TelegramChat.objects.get(api_id=api_id)
     except N3TelegramChat.DoesNotExist:
         return
+
     for project in telegram_chat.projects:
         if project.get('id') == gitlab_project.get('id'):
             return

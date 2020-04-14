@@ -3,8 +3,15 @@ from config import Config
 from huey import RedisHuey
 from mongoengine import connect
 from emoji import emojize
+import logging
 
-from n3robot import (N3TelegramMessagePipeline, N3TelegramMessagePush, N3TelegramMessageBuild, N3TelegramMessageTagPush)
+from n3robot import (N3TelegramMessagePipeline, N3TelegramMessagePush, N3TelegramMessageBuild, N3TelegramMessageTagPush,
+                     N3TelegramMessageMergeRequestHook)
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+app_logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config.from_object(Config)
