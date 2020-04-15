@@ -25,9 +25,10 @@ def gitlab(project_api_id):
     gitlab_project = message.get_project()
     message_text = render_template(message.template, **context, **emoji_map)
 
+    tasks.update_projects_chat(project_api_id, gitlab_project)
     tasks.send_message(api_id=project_api_id,
                        message=message_text,
                        branch=message.get_branch(),
                        gitlab_project=gitlab_project)
-    tasks.update_projects_chat(project_api_id, gitlab_project)
-    return 'A message added to a queue', 201
+
+    return 'ok', 201

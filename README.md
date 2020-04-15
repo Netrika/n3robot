@@ -1,10 +1,16 @@
-# N3Robot
+# N3Robot (Prototype)
 
 Bot by manage notifications from GitLab.
 
-## Run
+## How to use
 
-You can run `make` for launch docker-compose.
+- Copy env.example to .env and add your secrets
+- Run `make`
+- Add your bot to chat
+- send command /register
+
+It will be created a document in a collection telegram_chats. After you can send /geturl and will be return URL which you have to paste to part Integration in settings your project.
+
 
 ## Bot commands
 
@@ -29,12 +35,6 @@ You can run `make` for launch docker-compose.
 | Job Events                 | Yes     |
 | Merge request events       | No      |
 | Pipeline Events            | Yes     |
-| Push Events                | Yes     |
+| Push Events                | No     |
 | Tag Push Events            | Yes     |
 | Wiki Page events           | No      |
-
-
-## How to use
-
-Add your bot to chat and send command /register. It will be created a document in a collection telegram_chats. After you can send /geturl and will be return URL which you have to paste to part Integration in settings your project.
-After the first sending, you don't get a message because project didn't exist.

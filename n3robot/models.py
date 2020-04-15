@@ -46,7 +46,7 @@ class N3TelegramMessage:
         return {}
 
     def get_branch(self):
-        pass
+        return
 
 
 class N3TelegramMessagePipeline(N3TelegramMessage):
@@ -101,3 +101,18 @@ class N3TelegramMessagePush(N3TelegramMessage):
 
 class N3TelegramMessageTagPush(N3TelegramMessage):
     template = 'telegram/tag_push.j2'
+
+    def get_project(self):
+        gitlab_project = {}
+        project = self.raw_data.get('project')
+
+        gitlab_project.update(
+            id=project.get('id'),
+            name=project.get('name'),
+            web_url=project.get('web_url')
+        )
+        return gitlab_project
+
+
+class N3TelegramMessageMergeRequestHook(N3TelegramMessage):
+    template = 'telegram/merge_request.j2'

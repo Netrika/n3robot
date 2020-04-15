@@ -1,3 +1,7 @@
 Gz! You register a chat. Now you can add your URL to settings project and get notifications.
 
 You URL: {{ project_url }}/gitlab/{{ api_id }}
+
+{% if wiki_url is defined %}
+More information [here]({{ wiki_url }}).
+{% endif %}

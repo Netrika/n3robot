@@ -54,7 +54,7 @@ services:
 
   mongodb:
     volumes:
-      - ./data/db:/data/db
+      - ../data/db:/data/db
     image: "mongo:3.6-xenial"
     networks:
       - backend

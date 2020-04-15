@@ -1,6 +1,7 @@
 from n3robot import N3TelegramUser, N3TelegramChat
 from telegram import ChatAction
 from config import Config
+from .manage_chat import register
 
 
 def send_welcome(update, context):
@@ -12,8 +13,12 @@ def send_welcome(update, context):
     :param context:
     :return:
     """
+
     for member in update.message.new_chat_members:
         context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+
+        if context.bot.id == member.id:
+            register(update, context)
 
         telegram_user = N3TelegramUser(
             id=member.id,
