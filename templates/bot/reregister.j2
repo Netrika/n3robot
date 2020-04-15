@@ -1,4 +1,6 @@
 Gz! You registered a chat again!  Your URL for a notification updated - {{ project_url }}/gitlab/{{ api_id }}!
 Don't forget to update settings your project! Have a nice day.
 
+{% if wiki_url is defined %}
 More information [here]({{ wiki_url }}).
+{% endif %}

@@ -2,4 +2,6 @@ Gz! You register a chat. Now you can add your URL to settings project and get no
 
 You URL: {{ project_url }}/gitlab/{{ api_id }}
 
+{% if wiki_url is defined %}
 More information [here]({{ wiki_url }}).
+{% endif %}
