@@ -17,3 +17,7 @@ build/images:
 start: build/images
 	@mkdir -p data/db
 	docker-compose --file .cicd/docker-compose.yml up
+
+.PHONY: help
+help:
+	@echo "help"
