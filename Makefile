@@ -1,4 +1,5 @@
 .DEFAULT_GOAL:=start
+.SHELLFLAGS = -ec
 
 .EXPORT_ALL_VARIABLES:
 COMPOSE_PROJECT_NAME = n3robot
@@ -16,7 +17,7 @@ build/images:
 .PHONY: start
 start: build/images
 	@mkdir -p data/db
-	docker-compose --file .cicd/docker-compose.yml up
+	@docker-compose --file .cicd/docker-compose.yml up
 
 .PHONY: help
 help:
