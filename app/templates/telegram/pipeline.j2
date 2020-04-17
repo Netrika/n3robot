@@ -6,7 +6,7 @@
 {%set pipeline_status_emoji = failed_emoji %}
 {% endif %}
 
-{{ pipeline_status_emoji }} Pipeline [#{{ object_attributes.id }}]({{ project.web_url }}/pipelines/{{ object_attributes.id }}) of [{{ project.path_with_namespace }}]({{ project.web_url }}) {{ object_attributes.status }}.
+{{ pipeline_status_emoji }} Pipeline [#{{ object_attributes.id }}]({{ project.web_url }}/pipelines/{{ object_attributes.id }}) of [{{ project.path_with_namespace }}]({{ project.web_url }}) {{ object_attributes.status }} ({{ object_attributes.ref }}).
 
 *By:* {{ user.name }}
 {% if object_attributes.status == 'success' or object_attributes.status == 'failed' %}
